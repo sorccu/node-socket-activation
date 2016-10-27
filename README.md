@@ -1,5 +1,7 @@
 # node-socket-activation
 
+[![npm](https://img.shields.io/npm/v/socket-activation.svg)](https://www.npmjs.com/package/socket-activation)
+
 **node-socket-activation** is a [socket activation](http://0pointer.de/blog/projects/socket-activation.html) library for [Node.js](https://nodejs.org/).
 
 ## Supported systems
