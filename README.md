@@ -82,8 +82,11 @@ Returns the list of fds the system has managed for us. This operation consumes t
 This method throws an `Error` if:
 
 * The process was not launched by the service management framework.
+    - Error `.code` is `'ESRCH'`
 * There is no matching socket.
+    - Error `.code` is `'ENOENT'`
 * The fd list has already been collected previously.
+    - Error `.code` is `'EALREADY'`
 * An internal system error occured.
 
 ## License

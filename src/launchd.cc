@@ -1,6 +1,16 @@
 #include <nan.h>
 #include <launch.h>
 
+v8::Local<v8::Value> complain(const char *msg, const char *code) {
+  v8::Local<v8::Value> ex = Nan::Error(msg);
+  v8::Local<v8::Object> obj = ex.As<v8::Object>();
+  obj->Set(
+    Nan::New<v8::String>("code").ToLocalChecked(),
+    Nan::New<v8::String>(code).ToLocalChecked()
+  );
+  return ex;
+}
+
 NAN_METHOD(Collect) {
   if (info.Length() != 1) {
     return Nan::ThrowError(Nan::TypeError("Must be given exactly 1 argument"));
@@ -14,12 +24,30 @@ NAN_METHOD(Collect) {
   switch (err) {
   case 0:
     break;
-  case ENOENT:
-    return Nan::ThrowError("The socket name specified does not exist in the caller's launchd.plist");
-  case ESRCH:
-    return Nan::ThrowError("The calling process is not managed by launchd");
-  case EALREADY:
-    return Nan::ThrowError("The specified socket has already been activated");
+  case ENOENT: {
+    v8::Local<v8::Value> ex = complain(
+      "The socket name specified does not exist in the caller's launchd.plist",
+      "ENOENT"
+    );
+
+    return Nan::ThrowError(ex);
+  }
+  case ESRCH: {
+    v8::Local<v8::Value> ex = complain(
+      "The calling process is not managed by launchd",
+      "ESRCH"
+    );
+
+    return Nan::ThrowError(ex);
+  }
+  case EALREADY: {
+    v8::Local<v8::Value> ex = complain(
+      "The specified socket has already been activated",
+      "EALREADY"
+    );
+
+    return Nan::ThrowError(ex);
+  }
   default:
     return Nan::ThrowError(strerror(err));
   }
