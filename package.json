@@ -1,0 +1,20 @@
+{
+  "name": "socket-activation",
+  "version": "1.0.0",
+  "description": "Native socket activation for launchd et al.",
+  "keywords": [
+    "launch_activate_socket",
+    "launchd",
+    "socket activation"
+  ],
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sorccu/node-socket-activation.git"
+  },
+  "main": "./index",
+  "dependencies": {
+    "bindings": "^1.2.1",
+    "nan": "^2.4.0"
+  }
+}
