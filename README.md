@@ -14,6 +14,20 @@
 [launchd-sockets]: https://developer.apple.com/library/content/documentation/MacOSX/Conceptual/BPSystemStartup/Chapters/CreatingLaunchdJobs.html#//apple_ref/doc/uid/10000172i-SW7-SW4
 [systemd-socket]: https://www.freedesktop.org/software/systemd/man/systemd.socket.html
 
+## Installation
+
+Using [yarn](https://yarnpkg.com/):
+
+```sh
+yarn add socket-activation
+```
+
+Using [npm](https://www.npmjs.com/):
+
+```sh
+npm install --save socket-activation
+```
+
 ## Usage
 
 ### How your app should look like
