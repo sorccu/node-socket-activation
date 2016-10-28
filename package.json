@@ -1,10 +1,11 @@
 {
   "name": "socket-activation",
   "version": "1.1.0",
-  "description": "Native socket activation for launchd et al.",
+  "description": "Native socket activation for launchd, systemd et al.",
   "keywords": [
     "launch_activate_socket",
     "launchd",
+    "systemd",
     "socket activation"
   ],
   "license": "Apache-2.0",
