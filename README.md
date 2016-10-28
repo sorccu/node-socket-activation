@@ -6,49 +6,19 @@
 
 ## Supported systems
 
-| Service management framework    | OS                      | Supported                |
-|---------------------------------|-------------------------|--------------------------|
-| [launchd][launchd-sockets]      | macOS 10.9 or later     | :thumbsup: :bowtie:      |
-| [systemd][systemd-socket]       | Compatible Linux distro | :thumbsdown: :persevere: |
+| Service management framework    | OS                      | Supported?          |
+|---------------------------------|-------------------------|---------------------|
+| [launchd][launchd-sockets]      | macOS 10.9 or later     | :thumbsup: :bowtie: |
+| [systemd][systemd-socket]       | Compatible Linux distro | :thumbsup: :bowtie: |
 
 [launchd-sockets]: https://developer.apple.com/library/content/documentation/MacOSX/Conceptual/BPSystemStartup/Chapters/CreatingLaunchdJobs.html#//apple_ref/doc/uid/10000172i-SW7-SW4
 [systemd-socket]: https://www.freedesktop.org/software/systemd/man/systemd.socket.html
 
 ## Usage
 
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-    <dict>
-        <key>Label</key>
-        <string>app.job</string>
-        <key>ProgramArguments</key>
-        <array>
-            <string>/usr/local/bin/node</string>
-            <string>ABSOLUTE_PATH_TO_YOUR_JS_FILE</string>
-        </array>
-        <key>RunAtLoad</key>
-        <true/>
-        <key>Sockets</key>
-        <dict>
-            <key>app</key>
-            <array>
-                <dict>
-                    <key>SockFamily</key>
-                    <string>IPv4</string>
-                    <key>SockServiceName</key>
-                    <string>3000</string>
-                </dict>
-            </array>
-        </dict>
-        <key>StandardErrorPath</key>
-        <string>/tmp/app.job.err</string>
-        <key>StandardOutPath</key>
-        <string>/tmp/app.job.out</string>
-    </dict>
-</plist>
-```
+### How your app should look like
+
+#### `app.js`
 
 ```javascript
 const net = require('net')
@@ -75,21 +45,111 @@ for (const fd of sockets.collect('app')) {
 }
 ```
 
+See the [examples](examples/) directory for more examples incl. supporting both socket activation and direct execution.
+
+### Launchd configuration
+
+Normally you'd put this in `~/Library/LaunchAgents`.
+
+#### `org.example.app.plist`
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+        <key>Label</key>
+        <string>org.example.app</string>
+        <key>ProgramArguments</key>
+        <array>
+            <string>/usr/local/bin/node</string>
+            <string>ABSOLUTE_PATH_TO_YOUR_JS_FILE</string>
+        </array>
+        <key>Sockets</key>
+        <dict>
+            <key>app</key>
+            <array>
+                <dict>
+                    <key>SockFamily</key>
+                    <string>IPv4</string>
+                    <key>SockServiceName</key>
+                    <string>3000</string>
+                </dict>
+            </array>
+        </dict>
+        <key>StandardErrorPath</key>
+        <string>/tmp/org.example.app.err</string>
+        <key>StandardOutPath</key>
+        <string>/tmp/org.example.app.out</string>
+    </dict>
+</plist>
+```
+
+There's no need to set `RunAtLoad`, launchd will start your app on the first request.
+
+Enable and start listening by running:
+
+```sh
+launchctl load ~/Library/LaunchAgents/org.example.app.plist
+```
+
+### Systemd configuration
+
+Normally you'd put these in `/etc/systemd/system`.
+
+#### `app.service`
+
+```systemd
+[Unit]
+RefuseManualStart=true
+
+[Service]
+Restart=always
+ExecStart=/usr/local/bin/node ABSOLUTE_PATH_TO_YOUR_JS_FILE
+```
+
+#### `app.socket`
+
+```systemd
+[Socket]
+ListenStream=127.0.0.1:3000
+NoDelay=true
+FileDescriptorName=app
+
+[Install]
+WantedBy=sockets.target
+```
+
+Enable and start listening by running:
+
+```sh
+systemctl enable app.socket
+systemctl start app.socket
+```
+
+There's no need to enable the service, systemd will start it on the first request.
+
 ## API
 
 ### `.collect(String name) → [Number]`
 
-Returns the list of fds the system has managed for us. This operation consumes the list and can therefore only be performed once per launch. Subsequent calls will throw an `Error`.
+Returns the list of fds the system has managed for us. This operation consumes the list and can therefore only be performed once per launch. Subsequent calls *with the same `name`* throw an `Error`. It's your responsibility not to do that.
+
+The `name` is case sensitive and must match the name of the socket. Under systemd, the setting is [FileDescriptorName=](https://www.freedesktop.org/software/systemd/man/systemd.socket.html#FileDescriptorName=). Under launchd, the `<key>...</key>` of the socket definition defines the name.
+
+Note that the method returns an `Array` of fds. For example, there may be more than one fd if you select the "IPv4v6" SockFamily in launchd.plist which listens to both IPv4 and IPv6, or if several [ListenStream](https://www.freedesktop.org/software/systemd/man/systemd.socket.html#ListenStream=) are given in [systemd.socket](https://www.freedesktop.org/software/systemd/man/systemd.socket.html). Up to you to decide if you want to error out when given multiple fds or setup multiple listeners.
+
+The API is the same for all supported service managers.
 
 This method throws an `Error` if:
 
-* The process was not launched by the service management framework.
+* The process was not launched by the service management framework (or with `launchd`, if there's no matching socket).
     - Error `.code` is `'ESRCH'`
 * There is no matching socket.
     - Error `.code` is `'ENOENT'`
 * The fd list has already been collected previously.
     - Error `.code` is `'EALREADY'`
-* An internal system error occured.
+* An internal system error occurred.
 
 ## License
 
