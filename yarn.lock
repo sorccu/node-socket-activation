@@ -8,3 +8,7 @@ nan:
   version "2.4.0"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.4.0.tgz#fb3c59d45fe4effe215f0b890f8adf6eb32d2232"
 
+prebuilt-bindings:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/prebuilt-bindings/-/prebuilt-bindings-1.0.0.tgz#ea5bf68e184af4a238638c5280b6ee2c748b7e5e"
+

@@ -14,8 +14,13 @@
     "url": "https://github.com/sorccu/node-socket-activation.git"
   },
   "main": "./index",
+  "scripts": {
+    "install": "node ./prebuilt-bindings install",
+    "prebuilt-bindings": "node ./prebuilt-bindings"
+  },
   "dependencies": {
     "bindings": "^1.2.1",
-    "nan": "^2.4.0"
+    "nan": "^2.4.0",
+    "prebuilt-bindings": "^1.0.0"
   }
 }
