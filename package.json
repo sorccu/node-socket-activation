@@ -1,6 +1,6 @@
 {
   "name": "socket-activation",
-  "version": "3.0.2",
+  "version": "3.1.0",
   "description": "Native socket activation for launchd, systemd et al.",
   "keywords": [
     "launch_activate_socket",
