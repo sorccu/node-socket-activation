@@ -1,6 +1,7 @@
 .DS_Store
-/*.tgz
 /*.node.gz
+/*.tgz
+/.python-version
 /build/
 /examples/
 /node_modules/
