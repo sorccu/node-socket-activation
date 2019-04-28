@@ -9,5 +9,8 @@ pack:
 		nvm exec 6 npm run prebuilt-bindings -- clean build pack && \
 		nvm exec 7 npm run prebuilt-bindings -- clean build pack && \
 		nvm exec 8 npm run prebuilt-bindings -- clean build pack && \
-		nvm exec 9 npm run prebuilt-bindings -- clean build pack \
+		nvm exec 9 npm run prebuilt-bindings -- clean build pack && \
+		nvm exec 10 npm run prebuilt-bindings -- clean build pack && \
+		nvm exec 11 npm run prebuilt-bindings -- clean build pack && \
+		nvm exec 12 npm run prebuilt-bindings -- clean build pack \
 	)
