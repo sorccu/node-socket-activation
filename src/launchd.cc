@@ -4,7 +4,8 @@
 v8::Local<v8::Value> complain(const char *msg, const char *code) {
   v8::Local<v8::Value> ex = Nan::Error(msg);
   v8::Local<v8::Object> obj = ex.As<v8::Object>();
-  obj->Set(
+  Nan::Set(
+    obj,
     Nan::New<v8::String>("code").ToLocalChecked(),
     Nan::New<v8::String>(code).ToLocalChecked()
   );
@@ -16,7 +17,7 @@ NAN_METHOD(Collect) {
     return Nan::ThrowError(Nan::TypeError("Must be given exactly 1 argument"));
   }
 
-  Nan::Utf8String handleName(info[0]->ToString());
+  Nan::Utf8String handleName(info[0]);
   int *fds;
   size_t cnt;
 
